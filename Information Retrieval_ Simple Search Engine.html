@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0057)http://cecs.wright.edu/~keke.chen/ir/2019sp/prj1/sse.html -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Information Retrieval: Simple Search Engine</title>
+
+<link rel="stylesheet" href="./Information Retrieval_ Simple Search Engine_files/style.css" type="text/css">
+</head>
+
+<body>
+
+<!--p><img alt="Wright State University" src="images/wsu.gif" width="357"/></p>
+
+<hr/-->
+
+<h2>Information Retrieval: Simple Search Engine</h2>
+
+<!--p><b>Due:</b> March 11 (11:59pm) </p-->
+
+<p>The primary purpose of this assignment is to get familiar with
+ the basic term generation, indexing, and query processing algorithms and use them to implement a simple search engine. 
+</p>
+<p>
+	You will build your search engine with the given skeleton code in Python and test on the <a href="http://web1.cs.wright.edu/~tkprasad/courses/cs7800/asg-S16/CranfieldDataset.zip">Cranfield Dataset</a>. You can work individually or in a two-person team.  
+</p>
+
+<p><b>Setup:</b> 
+</p><ul>
+	<li>You will need to use the <a href="http://www.nltk.org/">NLTK toolkit</a> for stemming. For Ubuntu, it is easy to install
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">sudo pip install -U nltk
+</pre></div>
+Install the python pip package first if you have not yet. For other platforms, please check the web site for instructions.
+</li>
+<li> Download <a href="http://web1.cs.wright.edu/~tkprasad/courses/cs7800/asg-S16/CranfieldDataset.zip"> the Cranfield dataset</a>. It contains three files: cran.all - the document collection, query.text - the sample queries, qrels.text - the relevant query-document pairs. Check README.txt for more details. 
+</li>
+<li> Download <a href="http://cecs.wright.edu/~keke.chen/ir/2019sp/prj1/prj1.zip">the skeleton code</a>.</li>
+</ul>
+<p></p>
+
+
+<h3> Part 1: Building Inverted Index</h3>
+
+The preprocessing steps include
+<ul>
+<li> 
+	split a document to a list of tokens and lowercase the tokens.
+</li>
+<li> remove the stopwords. A list of stopwords has been provided - check the file "stopwords" in the directory.
+</li>
+<li> stemming. Use a <a href="http://www.nltk.org/howto/stem.html">stemmer in NLTK</a>.
+</li>
+</ul>
+<p>These steps are shared by both indexing and query processing. Thus, it's better to put these common functions in one place. Check the util.py file.
+</p>
+
+The Cranfield document file has a special format. cran.py has been provided to simplify your work in reading the documents.
+
+<p>Once you get a list of terms, use the steps to put the terms in the inverted index and sort the lists correspondingly. Check the files: doc.py and index.py to understand how the classes are organized, and then implement the ToDo methods. The sketch code stores term positions in each documents (check the Posting class). The postings are organized in IndexItem, which is an entry in the inverted index. 
+</p>
+
+<p>Finally, the index should be saved to a file. You can use any serialization method you like (e.g., JSON or any Python built-in libraries). Make sure the index can be saved/loaded correctly.
+
+</p><p> You should provide the executable indexing program that can be used as follows
+<!-- HTML generated using hilite.me --></p><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">python index.py cran.all index_file
+</pre></div>
+It builds the index for the cran.all file and saves the index into the index_file.
+<p></p>
+
+
+<h3> Part 2: Query Processing</h3>
+<p>The query processing component contains the following steps.
+</p><ul>
+<li> Query preprocessing, which includes all the steps used for preprocessing documents in indexing. In addtion, you should also use the spelling corrector. Please check the <a href="http://norvig.com/spell-correct.html">Norvig's implementation</a> and understand the algorithm. The python code of the spelling corrector has been included in the skeleton code: norvig_spell.py (need some testing to make sure it work as expected).
+</li>
+<li> Process queries with the Boolean model. Check the textbook or slides for the processing algorithm.
+</li>
+<li> Process queries with the vector model. Use TFIDF to represent the weights in the vector representation. Use the cosine similarity for ranking. </li>
+</ul>
+<p></p>
+
+<p>
+	Your standard query processing program should be run  as follows
+<!-- HTML generated using hilite.me --></p><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">python query.py index_file processing_algorithm query.text query_id
+</pre></div>
+where processing_algorithm indicates the Boolean or vector model: 0 - Boolean, and 1 - vector, query.text contains the sample queries (included in the Cranfield dataset), and query_id is the specific query you choose. cranqry.py has been provided for reading the special format used by query.text. The output will be a list of document IDs for the Boolean model, and the top 3 ranked results for the vector model. 
+
+You can certainly design your own commandline options that accept arbitrary queries.
+<p></p>
+
+
+
+<p>Check qrels.text in the Cranfield dataset for evaluating the quality of search results. You can use the ndcg_score function in metrics.py to evaluate the quality. Please finish the program "batch_eval.py" to compute the average NDCGs for the boolean-model and vector-model based query processing results, respectively, and use <a href="https://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.stats.ttest_ind.html">t-test</a> or <a href="https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.wilcoxon.html">wilcoxon-test </a> to get the p-value. 
+</p><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">python batch_eval.py index_file query.text qrels.text n
+	</pre></div>
+where n is the number of randomly selected queries from query.text.
+<p></p>
+
+<p>Please test/debug all your programs thoroughly. By designing tests, ask yourself questions like
+	</p><ul>
+		<li> Are the stopwords really removed? Are the terms in index all stemmed? 
+		</li>
+		<li> What is the number of terms in the dictionary and what is the size of postings? Do they make sense?
+		</li>
+		<li> Are index saving and loading working as expected?</li>
+		<li> Do you also convert queries to terms? </li>
+		<li> How do you confirm that TFIDF values are computed correctly? </li>
+		<li> How do you confirm cosine similarity is computed correctly?</li>
+		<li> Are your selected sample queries getting the same results as you expect (manually computed) for boolean model processing?</li>
+		<li> Are your selected sample queries getting the same results as you expect for vector model processing?</li>
+		<li> Do the NDCGs for selected sample queries match your manually computed results?</li>
+		<li> etc.</li> 
+	</ul>
+<p></p>
+
+<h3> Deliverables</h3>
+<p> Turn in three files (DO NOT zip them into one zip file) to Pilot: (1) a brief documentation about your design, implementation, and tests you have done, (2) paste your well-commented source code in one PDF file, and (3) the zipped whole source code directory. You should put your team members names in the beginning of each PDF file.  
+</p>
+
+<p>
+Plagiarism will be penalized with an award of 0 and further action. No deadline extension will be given. 
+</p>
+
+<hr>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody><tr><td valign="top" align="left">
+<small>This page, modified: Feb 22, 2019
+</small>
+</td>
+</tr></tbody></table>
+
+
+
+</body></html>
